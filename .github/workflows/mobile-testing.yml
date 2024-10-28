@@ -22,7 +22,6 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      # Instalação do Android SDK
       - name: Set up Android SDK
         uses: android-actions/setup-android@v2
         with:
@@ -32,32 +31,23 @@ jobs:
           profile: default
           emulator-build: stable
 
-      # Instalar a imagem do sistema Android necessária para o AVD
       - name: Install Android System Image
         run: yes | sdkmanager "system-images;android-30;google_apis;x86_64"
 
-      # Criação do emulador com o nome "Android"
       - name: Create Android Emulator
         run: echo "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd -n Android -k "system-images;android-30;google_apis;x86_64" --force
 
-      # Verificar se o AVD foi criado corretamente
+      - name: Set ANDROID_AVD_HOME
+        run: echo "export ANDROID_AVD_HOME=$HOME/.android/avd" >> $GITHUB_ENV
+
+      - name: Fix Permissions
+        run: sudo chmod -R 777 $HOME/.android/avd/
+
       - name: List Available AVDs
         run: $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager list avd
 
-      # Iniciar o Emulador
       - name: Start Emulator
         run: |
-          sudo $ANDROID_HOME/emulator/emulator -avd Android -no-audio -no-window &
+          $ANDROID_HOME/emulator/emulator -avd Android -no-audio -no-window &
           adb wait-for-device
           adb shell input keyevent 82
-
-      # Instalação e Inicialização do Appium
-      - name: Install Appium
-        run: npm install -g appium
-
-      - name: Start Appium Server
-        run: appium &
-
-      # Execução dos testes com WebdriverIO e Appium
-      - name: Run Mobile Tests
-        run: npx wdio run wdio.conf.js
