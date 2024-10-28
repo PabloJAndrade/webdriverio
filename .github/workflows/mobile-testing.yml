@@ -44,12 +44,12 @@ jobs:
 
       # Criar o Emulador Android
       - name: Create Android Emulator
-        run: echo "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd -n test -k "system-images;android-30;google_apis;x86_64" --force
+        run: echo "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd -n Android -k "system-images;android-30;google_apis;x86_64" --force
 
       # Iniciar o Emulador
       - name: Start Emulator
         run: |
-          sudo $ANDROID_HOME/emulator/emulator -avd test -no-audio -no-window &
+          sudo $ANDROID_HOME/emulator/emulator -avd Android -no-audio -no-window &
           adb wait-for-device
           adb shell input keyevent 82
 
