@@ -26,12 +26,21 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v2
         with:
-          api-level: 30 # Versão do Android desejada
+          api-level: 30
           target: default
           arch: x86_64
           profile: default
           emulator-build: stable
 
+      # Listar emuladores disponíveis (opcional para verificação)
+      - name: List Available AVDs
+        run: $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager list avd
+
+      # Criar o Emulador Android
+      - name: Create Android Emulator
+        run: echo "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd -n Android -k "system-images;android-30;google_apis;x86_64" --force
+
+      # Iniciar o Emulador
       - name: Start Emulator
         run: |
           sudo $ANDROID_HOME/emulator/emulator -avd test -no-audio -no-window &
@@ -44,7 +53,7 @@ jobs:
 
       - name: Start Appium Server
         run: appium &
-        
-      # Execução dos testes
+
+      # Execução dos testes com WebdriverIO e Appium
       - name: Run Mobile Tests
         run: npx wdio run wdio.conf.js
