@@ -5,49 +5,58 @@ on:
     branches:
       - main
   pull_request:
-env:
-  ANDROID_ARCH: x86_64
-  ANDROID_TARGET: google_apis
-  API_LEVEL: 30
-  ANDROID_BUILD_TOOLS_VERSION: 33.0.2
-  ANDROID_SDK_PACKAGES: "system-images;android-30;google_apis;x86_64 platforms;android-30 build-tools;33.0.2 platform-tools emulator"
-  EMULATOR_TIMEOUT: 350
-  EMULATOR_NAME: Android
 
 jobs:
-  webdriverIo-emulator:
-    timeout-minutes: 20
+  android-tests:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
-      
-      - name: Add SDK Tools to PATH
-        run: |
-          echo "$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/emulator:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools/${ANDROID_BUILD_TOOLS_VERSION}" >> $GITHUB_PATH
-     
-      - name: Install SDK and Accept Licenses
-        run: |
-          yes | sdkmanager --licenses
-          sdkmanager --install "${ANDROID_SDK_PACKAGES}"
-     
-      - name: Create AVD
-        run: |
-          echo "no" | avdmanager --verbose create avd --force -n $EMULATOR_NAME --abi "${ANDROID_TARGET}/${ANDROID_ARCH}" -k "system-images;android-${API_LEVEL};${ANDROID_TARGET};${ANDROID_ARCH}"
-      
-      - name: Start Emulator
-        run: |
-          $ANDROID_HOME/emulator/emulator -avd $EMULATOR_NAME -no-audio -no-window -no-accel &
-          adb wait-for-device
-          adb shell input keyevent 82
-    
-      - name: Install Appium
-        run: |
-          npm install -g appium@next --unsafe-perm=true --allow-root
-          appium driver install uiautomator2
-      
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
       - name: Install Dependencies
         run: npm install
-    
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v2
+        with:
+          api-level: 30
+          target: google_apis
+          arch: x86_64
+          profile: default
+          emulator-build: stable
+
+      - name: Install Android System Image
+        run: yes | sdkmanager "system-images;android-30;google_apis;x86_64"
+
+      - name: Create Android Emulator
+        run: echo "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd -n Android -k "system-images;android-30;google_apis;x86_64" --force
+
+      - name: Set ANDROID_AVD_HOME
+        run: echo "export ANDROID_AVD_HOME=$HOME/.android/avd" >> $GITHUB_ENV
+
+      - name: Fix Permissions
+        run: sudo chmod -R 777 $HOME/.android/avd/
+
+      - name: List Available AVDs
+        run: $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager list avd
+
+      - name: Start Emulator
+        run: |
+          $ANDROID_HOME/emulator/emulator -avd Android -no-audio -no-window -no-accel &
+          adb wait-for-device
+          adb shell input keyevent 82
+
+      - name: Install Appium
+        run: npm install -g appium
+
+      - name: Start Appium Server
+        run: appium &
+
       - name: Run Mobile Tests
         run: npx wdio run wdio.conf.js
