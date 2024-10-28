@@ -1,7 +1,10 @@
-name: Wdio-MobileApp-Emulator
+name: Mobile Test Automation
 
 on:
-  workflow_dispatch
+  push:
+    branches:
+      - main
+  pull_request:
 env:
   ANDROID_ARCH: x86_64
   ANDROID_TARGET: google_apis
