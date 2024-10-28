@@ -61,7 +61,7 @@ jobs:
         run: appium &
         
       - name: Install APK
-        run: adb install ../apk/stagfc1.123.39.apk
+        run: adb install stagfc1.123.39.apk
         
       - name: Run Mobile Tests
         run: npx wdio run wdio.conf.js
