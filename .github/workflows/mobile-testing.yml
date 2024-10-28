@@ -10,41 +10,41 @@ env:
   ANDROID_TARGET: google_apis
   API_LEVEL: 30
   ANDROID_BUILD_TOOLS_VERSION: 33.0.2
-  ANDROID_SDK_PACKAGES: system-images;androdi-30;google_apis;x84_64 platagorms;android-30build-tools;33.0.2 platform-tools emulator
+  ANDROID_SDK_PACKAGES: "system-images;android-30;google_apis;x86_64 platforms;android-30 build-tools;33.0.2 platform-tools emulator"
   EMULATOR_TIMEOUT: 350
   EMULATOR_NAME: Android
+
 jobs:
   webdriverIo-emulator:
     timeout-minutes: 20
-
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
       
-      - name: Add avdmanager and sdkmanager to system PATH
+      - name: Add SDK Tools to PATH
         run: |
-            echo "$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/emulator:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools/${{ env.ANDROID_BUILD_TOOLS_VERSION }}"  $GITHUB_PATH
+          echo "$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/emulator:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools/${ANDROID_BUILD_TOOLS_VERSION}" >> $GITHUB_PATH
      
-      - name: Install Sdk
+      - name: Install SDK and Accept Licenses
         run: |
-            yes Y | sdkmangaer --licenses
-            sdkmanager --install ${ANDROID_SDK_PACKAGES}
+          yes | sdkmanager --licenses
+          sdkmanager --install "${ANDROID_SDK_PACKAGES}"
      
-      - name: Build emulator
+      - name: Create AVD
         run: |
-            echo "no" | avdmanager --verbose create avd --force -n $EMULATOR_NAME --abi "${ANDROID_TARGET}/${ANDROID_ARCH}" -k "system-images;android-${API_LEVEL};${ANDROID_TARGET};${ANDROID_ARCH}"
+          echo "no" | avdmanager --verbose create avd --force -n $EMULATOR_NAME --abi "${ANDROID_TARGET}/${ANDROID_ARCH}" -k "system-images;android-${API_LEVEL};${ANDROID_TARGET};${ANDROID_ARCH}"
       
       - name: Start Emulator
         run: |
-          $ANDROID_HOME/emulator/emulator -avd Android -no-audio -no-window -no-accel &
+          $ANDROID_HOME/emulator/emulator -avd $EMULATOR_NAME -no-audio -no-window -no-accel &
           adb wait-for-device
           adb shell input keyevent 82
     
-      - name:  Instal appium
+      - name: Install Appium
         run: |
-            npm i -g appium@next --unsafe-perm=true --allow-root
-            appium driver install uiautomator2
+          npm install -g appium@next --unsafe-perm=true --allow-root
+          appium driver install uiautomator2
       
       - name: Install Dependencies
         run: npm install
