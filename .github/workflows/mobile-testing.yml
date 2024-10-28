@@ -31,6 +31,12 @@ jobs:
           arch: x86_64
           profile: default
           emulator-build: stable
+          
+      - name: Update Android SDK Tools
+        run: yes | sdkmanager --update
+      # Instalar a imagem do sistema Android
+      - name: Install Android System Image
+        run: yes | sdkmanager "system-images;android-30;google_apis;x86_64"
 
       # Listar emuladores disponíveis (opcional para verificação)
       - name: List Available AVDs
@@ -38,7 +44,7 @@ jobs:
 
       # Criar o Emulador Android
       - name: Create Android Emulator
-        run: echo "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd -n Android -k "system-images;android-30;google_apis;x86_64" --force
+        run: echo "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd -n test -k "system-images;android-30;google_apis;x86_64" --force
 
       # Iniciar o Emulador
       - name: Start Emulator
@@ -57,3 +63,5 @@ jobs:
       # Execução dos testes com WebdriverIO e Appium
       - name: Run Mobile Tests
         run: npx wdio run wdio.conf.js
+        
+
