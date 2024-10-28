@@ -41,6 +41,7 @@ export const config: Options.Testrunner = {
         'appium:appActivity': 'com.appfc.MainActivity',
         'appium:appWaitActivity': 'com.appfc.MainActivity',
         'appium:autoGrantPermissions': true,
+        'appium:ignoreHiddenApiPolicyError': true,
 
       }],
     logLevel: 'trace', // trace | debug | info | warn | error | silent
