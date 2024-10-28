@@ -1,0 +1,14 @@
+export { default as searchFlow } from './searchPage.page';
+export { default as loginPage } from './loginPage.page';
+export { default as addToCart } from './addToCart.page';
+export { default as checkoutOrderCreditCard } from './checkoutOrderCreditCard.page';
+export { default as checkoutOrderPix } from './checkoutOrderPix.page';
+export { default as RemoveCreditCard } from './removeCreditCard.page';
+export { default as GeneralPage } from './general.page';
+export { default as loginLocators } from '../locatorsPages/loginLocators';
+export { default as checkoutLocators } from '../locatorsPages/checkoutLocators';
+export { default as removeCreditCardLocators } from '../locatorsPages/removecreditcardLocators';
+export { default as addressLocators } from '../locatorsPages/addressLocators';
+export { default as addAddressflow } from './addAddress.page';
+export { default as RemoveCreditCardLocators } from '../locatorsPages/removecreditcardLocators';
+export { default as menuLocators } from '../locatorsPages/menuLocators';
