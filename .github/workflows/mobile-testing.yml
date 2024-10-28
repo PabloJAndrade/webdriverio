@@ -1,0 +1,50 @@
+name: Mobile Test Automation
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  android-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      - name: Install Dependencies
+        run: npm install
+
+      # Instalação do Android SDK
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v2
+        with:
+          api-level: 30 # Versão do Android desejada
+          target: default
+          arch: x86_64
+          profile: default
+          emulator-build: stable
+
+      - name: Start Emulator
+        run: |
+          sudo $ANDROID_HOME/emulator/emulator -avd test -no-audio -no-window &
+          adb wait-for-device
+          adb shell input keyevent 82
+
+      # Instalação e Inicialização do Appium
+      - name: Install Appium
+        run: npm install -g appium
+
+      - name: Start Appium Server
+        run: appium &
+        
+      # Execução dos testes
+      - name: Run Mobile Tests
+        run: npx wdio run wdio.conf.js
