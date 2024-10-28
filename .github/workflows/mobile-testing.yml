@@ -48,6 +48,15 @@ jobs:
 
       - name: Start Emulator
         run: |
-          $ANDROID_HOME/emulator/emulator -avd Android -no-audio -no-window &
+          $ANDROID_HOME/emulator/emulator -avd Android -no-audio -no-window -no-accel &
           adb wait-for-device
           adb shell input keyevent 82
+
+      - name: Install Appium
+        run: npm install -g appium
+
+      - name: Start Appium Server
+        run: appium &
+
+      - name: Run Mobile Tests
+        run: npx wdio run wdio.conf.js
