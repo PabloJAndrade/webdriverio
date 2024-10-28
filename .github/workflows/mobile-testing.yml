@@ -48,7 +48,7 @@ jobs:
 
       - name: Start Emulator
         run: |
-          $ANDROID_HOME/emulator/emulator -avd Android -no-audio -no-window -gpu swiftshader_indirect -no-snapshot-load &
+          $ANDROID_HOME/emulator/emulator -avd Android -no-accel -no-window -no-audio -no-window -gpu swiftshader_indirect -no-snapshot-load &
           adb wait-for-device
           sleep 30 # Aguarda 30 segundos para garantir que o emulador esteja inicializado
           adb shell input keyevent 82
