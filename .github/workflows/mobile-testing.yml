@@ -50,7 +50,7 @@ jobs:
         run: |
           $ANDROID_HOME/emulator/emulator -avd Android -no-accel -no-window -no-audio -no-window -gpu swiftshader_indirect -no-snapshot-load &
           adb wait-for-device
-          sleep 60 # Espera extra para garantir que o emulador esteja carregado
+          sleep 180 # Espera extra para garantir que o emulador esteja carregado
           adb exec-out screencap -p > /dev/null # Testa se o emulador está ativo
           adb shell input keyevent 82 || echo "Desbloqueio falhou, tentando continuar assim mesmo"
 
@@ -61,7 +61,7 @@ jobs:
         run: appium &
         
       - name: Install APK
-        run: adb install ./apk/stagfc1.123.39.apk
+        run: adb install apk/stagfc1.123.39.apk
         
       - name: Run Mobile Tests
         run: npx wdio run wdio.conf.js
